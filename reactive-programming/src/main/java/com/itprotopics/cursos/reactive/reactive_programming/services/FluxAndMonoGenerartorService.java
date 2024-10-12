@@ -21,6 +21,7 @@ public class FluxAndMonoGenerartorService {
     return Flux.fromIterable(List.of("alex", "ben", "chloe")).map(String::toUpperCase).log();
   }
 
+
   public Flux<String> namesFluxMap_inmutablility() {
     Flux<String> namesFlux = Flux.fromIterable(List.of("alex", "ben", "chloe"));
 
