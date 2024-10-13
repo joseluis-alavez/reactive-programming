@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: movies-review-service
+  profiles:
+    active: local
+  
+---
+
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+
+---
+
+logging:
+  level:
+    org.springframework.web: DEBUG
