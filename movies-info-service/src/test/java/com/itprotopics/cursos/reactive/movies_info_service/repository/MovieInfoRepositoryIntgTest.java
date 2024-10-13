@@ -25,8 +25,8 @@ public class MovieInfoRepositoryIntgTest {
     List<MovieInfo> movieinfos = List.of(
         new MovieInfo(null, "Batman Begins", 2005, List.of("Christian Bale", "Michael Cane"),
             LocalDate.parse("2005-06-15")),
-        new MovieInfo(null, "The Dark Knight", 2008, List.of("Christian Bale", "HeathLedger"),
-            LocalDate.parse("2008-07-18")),
+        new MovieInfo(null, "The Dark Knight", 2005, List.of("Christian Bale", "HeathLedger"),
+                LocalDate.parse("2008-07-18")),
         new MovieInfo("abc", "Batman Begins", 1989, List.of("Michael Keaton", "Jack Nicholson"),
             LocalDate.parse("1989-07-23")));
 
@@ -105,4 +105,23 @@ public class MovieInfoRepositoryIntgTest {
     StepVerifier.create(deletedMovieInfoMono).expectNextCount(0).verifyComplete();
   }
 
+  @Test
+  void findByYear() {
+    // given
+
+    // when
+    Flux<MovieInfo> moviesInfoFlux = movieInfoRepository.findByYear(2005).log();
+    // then
+    StepVerifier.create(moviesInfoFlux).expectNextCount(2).verifyComplete();
+  }
+
+  @Test
+  void findByName() {
+    // given
+
+    // when
+    Flux<MovieInfo> moviesInfoFlux = movieInfoRepository.findByName("Batman Begins").log();
+    // then
+    StepVerifier.create(moviesInfoFlux).expectNextCount(2).verifyComplete();
+  }
 }

@@ -29,8 +29,8 @@ public class MoviesInfoControllerIntgTest {
     List<MovieInfo> movieInfos = List.of(
         new MovieInfo(null, "Batman Begins", 2005, List.of("Christian Bale", "Michael Caine"),
             LocalDate.parse("2005-06-15")),
-        new MovieInfo(null, "The Dark Knight", 2008, List.of("Christian Bale", "HeathLedger"),
-            LocalDate.parse("2008-07-18")),
+        new MovieInfo(null, "The Dark Knight", 2005, List.of("Christian Bale", "HeathLedger"),
+                LocalDate.parse("2008-07-18")),
         new MovieInfo("123", "Dark Knight Rises", 2012, List.of("Christian Bale", "Tom Hardy"),
             LocalDate.parse("2012-07-20")));
 
@@ -96,6 +96,16 @@ public class MoviesInfoControllerIntgTest {
   }
 
   @Test
+  void testGetMovieInfoById_notFound() {
+    // given
+
+    // when
+    webTestClient.get().uri("/v1/movieinfos/" + "{id}", "def").exchange().expectStatus()
+        .isNotFound();
+    // then
+  }
+
+  @Test
   void testGetMovieInfoById_JsonPath() {
     // given
 
@@ -124,6 +134,20 @@ public class MoviesInfoControllerIntgTest {
     // then
   }
 
+
+  @Test
+  void testUpdateMovieInfo_notFound() {
+    // given
+    MovieInfo movieInfo = new MovieInfo(null, "Batman Begins1", 2005,
+        List.of("Christian Bale", "Michael Caine"), LocalDate.parse("2005-06-15"));
+
+    String id = "def";
+    // when
+    webTestClient.put().uri("/v1/movieinfos/" + "{id}", id).bodyValue(movieInfo).exchange()
+        .expectStatus().isNotFound();
+    // then
+  }
+
   @Test
   void testDeleteMovieInfo() {
     // given
@@ -139,5 +163,17 @@ public class MoviesInfoControllerIntgTest {
     // then
   }
 
+  @Test
+  void testFindByYear() {
+    // given
+
+    // when
+    int year = 2005;
+    webTestClient.get()
+        .uri(uriBuilder -> uriBuilder.path("/v1/movieinfos").queryParam("year", year).build())
+        .exchange().expectStatus().isOk().expectBodyList(MovieInfo.class).hasSize(2);
+
+    // then
+  }
 
 }
