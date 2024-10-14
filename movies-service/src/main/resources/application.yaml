@@ -3,9 +3,6 @@ spring:
     name: movies-review-service
   profiles:
     active: local
-
-server:
-  port: 8081
   
 ---
 
