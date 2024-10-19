@@ -64,5 +64,34 @@ public class ReviewRouterIntgTest {
         .expectBodyList(Review.class).hasSize(3);
   }
 
+  @Test
+  void testGetReviewsByMovieInfoId() {
+    // when
+    webTestClient.get().uri(REVIEWS_URL + "?movieInfoId=1").exchange().expectStatus().isOk()
+        .expectBodyList(Review.class).hasSize(2);
+  }
+
+  @Test
+  void testUpdateReview() {
+    // given
+    Review review = new Review(null, 1L, "Updated Movie", 8.5);
+
+    // when
+    webTestClient.put().uri(REVIEWS_URL + "/123").bodyValue(review).exchange().expectStatus().isOk()
+        .expectBody(Review.class).consumeWith(reviewEntityExchangeResult -> {
+          Review updatedReview = reviewEntityExchangeResult.getResponseBody();
+          assertNotNull(updatedReview);
+          assertEquals("123", updatedReview.getReviewId());
+          assertEquals(1L, updatedReview.getMovieInfoId());
+          assertEquals("Updated Movie", updatedReview.getComment());
+          assertEquals(8.5, updatedReview.getRating());
+        });
+  }
+
+  @Test
+  void testDeleteReview() {
+    // when
+    webTestClient.delete().uri(REVIEWS_URL + "/123").exchange().expectStatus().isNoContent();
+  }
 
 }

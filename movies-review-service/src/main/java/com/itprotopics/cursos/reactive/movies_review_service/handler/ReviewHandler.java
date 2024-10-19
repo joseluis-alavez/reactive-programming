@@ -1,5 +1,6 @@
 package com.itprotopics.cursos.reactive.movies_review_service.handler;
 
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -16,8 +17,20 @@ public class ReviewHandler {
 
   private final ReviewReactiveRepository reviewReactiveRepository;
 
+
   public Mono<ServerResponse> getReviews(ServerRequest request) {
-    Flux<Review> reviews = reviewReactiveRepository.findAll();
+
+    Optional<String> movieInfoId = request.queryParam("movieInfoId");
+
+    if (movieInfoId.isPresent()) {
+      return buildReviewsResponse(
+          reviewReactiveRepository.findByMovieInfoId(Long.valueOf(movieInfoId.get())));
+    } else {
+      return buildReviewsResponse(reviewReactiveRepository.findAll());
+    }
+  }
+
+  private Mono<ServerResponse> buildReviewsResponse(Flux<Review> reviews) {
     return ServerResponse.ok().body(reviews, Review.class);
   }
 
