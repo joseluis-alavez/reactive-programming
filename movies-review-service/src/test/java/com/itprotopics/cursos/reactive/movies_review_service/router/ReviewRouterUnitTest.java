@@ -10,18 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.mongodb.core.aggregation.ArrayOperators.ReverseArray;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import com.itprotopics.cursos.reactive.movies_review_service.domain.Review;
 import com.itprotopics.cursos.reactive.movies_review_service.handler.ReviewHandler;
 import com.itprotopics.cursos.reactive.movies_review_service.repository.ReviewReactiveRepository;
+import com.itprotopics.cursos.reactive.movies_review_service.exceptionhandler.GlobalErrorHandler;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest
 @AutoConfigureWebTestClient
-@ContextConfiguration(classes = {ReviewRouter.class, ReviewHandler.class})
+@ContextConfiguration(classes = { ReviewRouter.class, ReviewHandler.class, GlobalErrorHandler.class })
 public class ReviewRouterUnitTest {
 
   @MockBean
@@ -98,8 +98,36 @@ public class ReviewRouterUnitTest {
     when(reviewReactiveRepository.findById(review.getReviewId())).thenReturn(Mono.just(review));
     when(reviewReactiveRepository.deleteById(review.getReviewId())).thenReturn(Mono.empty());
 
-    webTestClient.delete().uri(REVIEWS_URL + "/{id}", review.getReviewId()).exchange()
-        .expectStatus().isNoContent();
+    webTestClient
+        .delete()
+        .uri(REVIEWS_URL + "/{id}", review.getReviewId())
+        .exchange()
+        .expectStatus()
+        .isNoContent();
+  }
+
+  @Test
+  void testAddReviewValidationError() {
+
+    // given
+    Review review = new Review(null, null, "Awesome Movie", -9.0);
+
+    when(reviewReactiveRepository.save(review)).thenReturn(Mono.just(review));
+
+    webTestClient
+        .post()
+        .uri(REVIEWS_URL)
+        .bodyValue(review)
+        .exchange()
+        .expectStatus()
+        .isBadRequest()
+        .expectBody(String.class)
+        .consumeWith(result -> {
+          assertEquals(
+              "movieInfoId cannot be null, rating.negative : rating is negative and please pass a non-negative value",
+              result.getResponseBody());
+        });
+
   }
 
 }
