@@ -6,12 +6,12 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.2.10</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.itprotopics.cursos.reactive</groupId>
-	<artifactId>movies-review-service</artifactId>
+	<artifactId>movies-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>movies-review-service</name>
+	<name>movies-service</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

@@ -1,13 +1,13 @@
-package com.itprotopics.cursos.reactive.movies_review_service;
+package com.itprotopics.cursos.reactive.movies_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MoviesReviewServiceApplication {
+public class MoviesServiceApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(MoviesReviewServiceApplication.class, args);
+    SpringApplication.run(MoviesServiceApplication.class, args);
   }
 
 }

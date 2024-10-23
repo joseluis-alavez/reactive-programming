@@ -1,4 +1,4 @@
-package com.itprotopics.cursos.reactive.movies_review_service.exceptionhandle;
+package com.itprotopics.cursos.reactive.movies_service.exceptionhandle;
 
 import java.util.stream.Collectors;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
