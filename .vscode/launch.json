@@ -19,10 +19,24 @@
     },
     {
       "type": "java",
+      "name": "MoviesReviewServiceApplication",
+      "request": "launch",
+      "mainClass": "com.itprotopics.cursos.reactive.movies_review_service.MoviesReviewServiceApplication",
+      "projectName": "movies-review-service"
+    },
+    {
+      "type": "java",
       "name": "ReactiveProgrammingApplication",
       "request": "launch",
       "mainClass": "com.itprotopics.cursos.reactive.reactive_programming.ReactiveProgrammingApplication",
-      "projectName": "reactive-programming"
+      "projectName": "com.itprotopics.cursos.reactive-reactive-programming"
+    },
+    {
+      "type": "java",
+      "name": "MoviesServiceApplication",
+      "request": "launch",
+      "mainClass": "com.itprotopics.cursos.reactive.movies_service.MoviesServiceApplication",
+      "projectName": "movies-service"
     }
   ]
 }
