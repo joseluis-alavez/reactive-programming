@@ -10,16 +10,18 @@ import com.itprotopics.cursos.reactive.movies_service.domain.MovieInfo;
 import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoClientException;
 import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoServerException;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class MoviesInfoRestClient {
 
   private WebClient webClient;
+
+  public MoviesInfoRestClient(WebClient webClient) {
+    this.webClient = webClient;
+  }
 
   @Value("${restClient.moviesInfoUrl}")
   private String moviesInfoUrl;

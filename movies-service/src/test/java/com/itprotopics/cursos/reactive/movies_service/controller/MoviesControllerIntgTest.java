@@ -21,8 +21,8 @@ import com.itprotopics.cursos.reactive.movies_service.domain.Movie;
 @AutoConfigureWebTestClient
 @AutoConfigureWireMock(port = 8084) // spin up a httpserver in port 8084
 @TestPropertySource(properties = {
-    "restClient.moviesInfoUrl=http://localhost:${wiremock.server.port}/v1/movieinfos",
-    "restClient.reviewsUrl=http://localhost:${wiremock.server.port}/v1/reviews"
+    "restClient.moviesInfoUrl=http://localhost:8084/v1/movieinfos",
+    "restClient.reviewsUrl=http://localhost:8084/v1/reviews"
 })
 public class MoviesControllerIntgTest {
 

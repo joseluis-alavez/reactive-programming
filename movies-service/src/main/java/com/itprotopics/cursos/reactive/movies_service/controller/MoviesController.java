@@ -13,11 +13,13 @@ import com.itprotopics.cursos.reactive.movies_service.domain.Movie;
 import com.itprotopics.cursos.reactive.movies_service.domain.Review;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/v1/movies")
 @AllArgsConstructor
+@Slf4j
 public class MoviesController {
 
   private final MoviesInfoRestClient moviesInfoRestClient;
@@ -25,13 +27,14 @@ public class MoviesController {
   private final ReviewsRestClient reviewsRestClient;
 
   @GetMapping("/{id}")
-  public Mono<Movie> retrieveMovieById(@PathVariable String movieId) {
-
+  public Mono<Movie> retrieveMovieById(@PathVariable("id") String movieId) {
+    log.info("Retrieving movie with id: {}", movieId);
     return moviesInfoRestClient.retrieveMovieInfo(movieId)
         .flatMap(movieInfo -> {
           Mono<List<Review>> reviewsListMono = reviewsRestClient.retrieveReviews(movieId)
               .collectList();
           return reviewsListMono.map(reviews -> new Movie(movieInfo, reviews));
+
         });
 
   }

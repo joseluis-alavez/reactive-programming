@@ -7,22 +7,22 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.itprotopics.cursos.reactive.movies_service.domain.Review;
-import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoClientException;
-import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoServerException;
 import com.itprotopics.cursos.reactive.movies_service.exception.ReviewsClientException;
 import com.itprotopics.cursos.reactive.movies_service.exception.ReviewsServerException;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class ReviewsRestClient {
 
   private WebClient webClient;
+
+  public ReviewsRestClient(WebClient webClient) {
+    this.webClient = webClient;
+  }
 
   @Value("${restClient.reviewsUrl}")
   private String reviewsUrl;
