@@ -3,21 +3,25 @@ package com.itprotopics.cursos.reactive.movies_review_service.handler;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
+
 import com.itprotopics.cursos.reactive.movies_review_service.domain.Review;
 import com.itprotopics.cursos.reactive.movies_review_service.exception.ReviewDataException;
 import com.itprotopics.cursos.reactive.movies_review_service.exception.ReviewNotFoundException;
 import com.itprotopics.cursos.reactive.movies_review_service.repository.ReviewReactiveRepository;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +31,8 @@ public class ReviewHandler {
   private final ReviewReactiveRepository reviewReactiveRepository;
 
   private final Validator validator;
+
+  private final Sinks.Many<Review> reviewSinks;
 
   public Mono<ServerResponse> getReviews(ServerRequest request) {
 
@@ -52,6 +58,7 @@ public class ReviewHandler {
     return request.bodyToMono(Review.class)
         .doOnNext(this::validate)
         .flatMap(reviewReactiveRepository::save)
+        .doOnNext(reviewSinks::tryEmitNext)
         .flatMap(ServerResponse.status(HttpStatus.CREATED)::bodyValue);
   }
 
@@ -85,5 +92,12 @@ public class ReviewHandler {
 
     return existingReview.flatMap(review -> reviewReactiveRepository.deleteById(reviewId))
         .then(ServerResponse.noContent().build());
+  }
+
+  public Mono<ServerResponse> getReviewsStream(ServerRequest request) {
+    return ServerResponse.ok()
+        .contentType(MediaType.APPLICATION_NDJSON)
+        .body(reviewSinks.asFlux(), Review.class)
+        .log();
   }
 }

@@ -12,6 +12,7 @@ import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoServer
 import com.itprotopics.cursos.reactive.movies_service.util.RetryUtil;
 
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -64,4 +65,34 @@ public class MoviesInfoRestClient {
         .log();
   }
 
+  public Flux<MovieInfo> retrieveMovieInfoStream() {
+
+    String url = UriComponentsBuilder
+        .fromUriString(moviesInfoUrl)
+        .path("/stream")
+        .toUriString();
+
+    return webClient
+        .get()
+        .uri(url)
+        .retrieve()
+        .onStatus(status -> status.is4xxClientError(), clientResponse -> {
+          log.info("Status code is : {}", clientResponse.statusCode());
+
+          return clientResponse.bodyToMono(String.class)
+              .flatMap(responseBody -> Mono
+                  .error(new MoviesInfoClientException(responseBody, clientResponse.statusCode().value())));
+        })
+        .onStatus(status -> status.is5xxServerError(), clientResponse -> {
+          log.info("Status code is : {}", clientResponse.statusCode());
+          return clientResponse.bodyToMono(String.class)
+              .flatMap(responseBody -> Mono
+                  .error(new MoviesInfoServerException(responseBody)));
+        })
+        .bodyToFlux(MovieInfo.class)
+        // .retry(3)
+        // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+        .retryWhen(RetryUtil.getRetrySpec())
+        .log();
+  }
 }

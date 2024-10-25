@@ -1,18 +1,23 @@
 package com.itprotopics.cursos.reactive.movies_info_service.controller;
 
 import static org.mockito.Mockito.*;
+
 import java.time.LocalDate;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
 import com.itprotopics.cursos.reactive.movies_info_service.domain.MovieInfo;
 import com.itprotopics.cursos.reactive.movies_info_service.service.MoviesInfoService;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 @WebFluxTest(MoviesInfoController.class)
 @AutoConfigureWebTestClient
@@ -21,6 +26,9 @@ public class MoviesInfoControllerUnitTest {
 
   @Autowired
   private WebTestClient webTestClient;
+
+  @MockBean
+  private Sinks.Many<MovieInfo> movieInfoSinks;
 
   @MockBean
   private MoviesInfoService moviesInfoService;

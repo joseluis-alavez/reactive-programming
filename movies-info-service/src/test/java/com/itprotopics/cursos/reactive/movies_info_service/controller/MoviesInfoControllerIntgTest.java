@@ -2,6 +2,7 @@ package com.itprotopics.cursos.reactive.movies_info_service.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,12 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
 import com.itprotopics.cursos.reactive.movies_info_service.domain.MovieInfo;
 import com.itprotopics.cursos.reactive.movies_info_service.repository.MovieInfoRepository;
+
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -76,6 +81,45 @@ public class MoviesInfoControllerIntgTest {
           assert movieInfo.getReleaseDate().equals(LocalDate.parse("2005-06-15"));
         });
 
+    // then
+  }
+
+  @Test
+  void testGetAllMovieInfo_stream() {
+    // given
+
+    MovieInfo movieInfo = new MovieInfo(null, "Batman Begins1", 2005,
+        List.of("Christian Bale", "Michael Caine"), LocalDate.parse("2005-06-15"));
+    // when
+    webTestClient
+        .post()
+        .uri("/v1/movieinfos")
+        .bodyValue(movieInfo)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(MovieInfo.class)
+        .consumeWith(movieInfoEntityExchangeResult -> {
+          MovieInfo savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+          assert savedMovieInfo != null;
+          assert savedMovieInfo.getMovieInfoId() != null;
+        });
+
+    Flux<MovieInfo> movieInfoFlux = webTestClient
+        .get()
+        .uri("/v1/movieinfos/stream")
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful()
+        .returnResult(MovieInfo.class)
+        .getResponseBody();
+
+    StepVerifier.create(movieInfoFlux)
+        .assertNext(movieInfo1 -> {
+          assert movieInfo1.getMovieInfoId() != null;
+        })
+        .thenCancel()
+        .verify();
     // then
   }
 
