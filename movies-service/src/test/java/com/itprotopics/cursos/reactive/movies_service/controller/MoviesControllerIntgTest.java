@@ -58,4 +58,82 @@ public class MoviesControllerIntgTest {
         });
 
   }
+
+  @SuppressWarnings("null")
+  @Test
+  void retrieveMovieById_notFound() {
+    // given
+    String movieId = "abc";
+    stubFor(get(urlEqualTo("/v1/movieinfos/" + movieId))
+        .willReturn(aResponse()
+            .withStatus(404)));
+
+    stubFor(get(urlPathEqualTo("/v1/reviews"))
+        .willReturn(aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("reviews.json")));
+
+    // when
+    webTestClient
+        .get()
+        .uri("/v1/movies/{id}", movieId)
+        .exchange()
+        .expectStatus()
+        .is4xxClientError()
+        .expectBody(String.class)
+        .isEqualTo("There is no movie info available for the passed in Id: abc");
+
+  }
+
+  @SuppressWarnings("null")
+  @Test
+  void retrieveMovieByI_reviewsNotFound() {
+    // given
+    String movieId = "abc";
+    stubFor(get(urlEqualTo("/v1/movieinfos/" + movieId))
+        .willReturn(aResponse()
+            .withHeader("Content-Type", "application/json")
+            .withBodyFile("movieinfo.json")));
+
+    stubFor(get(urlPathEqualTo("/v1/reviews"))
+        .willReturn(aResponse()
+            .withStatus(404)));
+
+    // when
+    webTestClient
+        .get()
+        .uri("/v1/movies/{id}", movieId)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(Movie.class)
+        .consumeWith(movieEntityExchangeResult -> {
+          var movie = movieEntityExchangeResult.getResponseBody();
+          assert Objects.requireNonNull(movie).getReviews().size() == 0;
+          assertEquals("Batman Begins", movie.getMovieInfo().getName());
+        });
+
+  }
+
+  @SuppressWarnings("null")
+  @Test
+  void retrieveMovieById_5xxError() {
+    // given
+    String movieId = "abc";
+    stubFor(get(urlEqualTo("/v1/movieinfos/" + movieId))
+        .willReturn(aResponse()
+            .withStatus(500)
+            .withBody("MovieInfo Service Unavailable")));
+
+    // when
+    webTestClient
+        .get()
+        .uri("/v1/movies/{id}", movieId)
+        .exchange()
+        .expectStatus()
+        .is5xxServerError()
+        .expectBody(String.class)
+        .isEqualTo("MovieInfo Service Unavailable");
+
+  }
+
 }
