@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.itprotopics.cursos.reactive.movies_service.domain.Movie;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -83,6 +84,8 @@ public class MoviesControllerIntgTest {
         .expectBody(String.class)
         .isEqualTo("There is no movie info available for the passed in Id: abc");
 
+    WireMock.verify(1, getRequestedFor(urlEqualTo("/v1/movieinfos/" + movieId)));
+
   }
 
   @SuppressWarnings("null")
@@ -133,6 +136,8 @@ public class MoviesControllerIntgTest {
         .is5xxServerError()
         .expectBody(String.class)
         .isEqualTo("MovieInfo Service Unavailable");
+
+    WireMock.verify(4, getRequestedFor(urlEqualTo("/v1/movieinfos/" + movieId)));
 
   }
 

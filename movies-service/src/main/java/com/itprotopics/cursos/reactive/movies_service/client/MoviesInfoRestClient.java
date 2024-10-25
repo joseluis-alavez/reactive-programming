@@ -9,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.itprotopics.cursos.reactive.movies_service.domain.MovieInfo;
 import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoClientException;
 import com.itprotopics.cursos.reactive.movies_service.exception.MoviesInfoServerException;
+import com.itprotopics.cursos.reactive.movies_service.util.RetryUtil;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -57,6 +58,9 @@ public class MoviesInfoRestClient {
                   .error(new MoviesInfoServerException(responseBody)));
         })
         .bodyToMono(MovieInfo.class)
+        // .retry(3)
+        // .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1)))
+        .retryWhen(RetryUtil.getRetrySpec())
         .log();
   }
 
